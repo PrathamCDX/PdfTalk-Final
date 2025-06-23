@@ -211,12 +211,16 @@ const Index = () => {
   if (!serverStarted) {
     // console.log(" loading :", isLoading);
     // console.log("Server is not started yet, showing waiting page data: ", data);
-    return <WaitingPage />;
+    return (
+      <>
+        <BackendWarning />
+        <WaitingPage />;
+      </>
+    );
   }
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 w-full transition-colors duration-200">
-      <BackendWarning />
       <div className="flex flex-col md:flex-row w-full min-h-screen h-[100vh]">
         {/* Sidebar Panel */}
         <div
