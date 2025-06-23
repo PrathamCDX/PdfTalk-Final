@@ -10,6 +10,7 @@ import { set } from "date-fns";
 import { authContext } from "@/App";
 import { Navigate, useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
+import BackendWarning from "@/components/BackendWarning";
 
 export interface PDFProject {
   id: string;
@@ -214,7 +215,8 @@ const Index = () => {
   }
 
   return (
-    <div className=" min-h-screen bg-gray-50 dark:bg-gray-900 w-full transition-colors duration-200">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 w-full transition-colors duration-200">
+      <BackendWarning />
       <div className="flex flex-col md:flex-row w-full min-h-screen h-[100vh]">
         {/* Sidebar Panel */}
         <div

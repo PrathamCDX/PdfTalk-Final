@@ -13,6 +13,7 @@ PDFTalks is a full-stack web application that enables users to upload PDF docume
 
 - **Frontend:** React, TypeScript, Vite, Tailwind CSS
 - **Backend:** Python, FastAPI
+- **Database:** SQL
 
 ## Project Structure
 
