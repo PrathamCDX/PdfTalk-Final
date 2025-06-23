@@ -73,7 +73,3 @@ frontend/
 - Open the frontend app in your browser (usually at `http://localhost:5173`)
 - Upload a PDF document
 - Use the chat interface to ask questions or analyze the PDF content
-
-## License
-
-This project is licensed under the MIT License.
