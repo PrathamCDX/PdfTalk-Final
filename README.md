@@ -71,6 +71,7 @@ frontend/
 ## Usage
 
 - Add the necessary API keys in the .env file to run the app locally
-- Open the frontend app in your browser (usually at `http://localhost:5173`)
+- Open the frontend app in your browser (usually at `http://localhost:5173`) or access the hosted version at [pdf-talks-drab.vercel.app](https://pdf-talks-drab.vercel.app)
+- Note: The backend is not hosted due to heavy ML models and free tier limitations. For full functionality, run the backend locally.
 - Upload a PDF document
 - Use the chat interface to ask questions or analyze the PDF content
