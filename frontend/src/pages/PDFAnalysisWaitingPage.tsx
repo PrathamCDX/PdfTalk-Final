@@ -11,6 +11,9 @@ const PDFAnalysisWaitingPage: React.FC = () => {
         Please wait while we process and analyze your uploaded PDF. This may
         take a few moments depending on the file size and server load.
       </p>
+      <div className="text-red-500">
+        Server can crash due to heavy ML models running in free tier{" "}
+      </div>
     </div>
   );
 };
