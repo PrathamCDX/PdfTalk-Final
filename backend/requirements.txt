@@ -1,0 +1,14 @@
+fastapi
+uvicorn
+python-dotenv
+PyPDF2
+pdfplumber
+sentence-transformers
+nltk
+transformers
+qdrant_client
+torch
+supabase
+pydantic
+python-multipart
+psutil
