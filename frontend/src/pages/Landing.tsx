@@ -12,7 +12,6 @@ const Landing = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-      <BackendWarning />
       {/* Header */}
       <header className="px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">

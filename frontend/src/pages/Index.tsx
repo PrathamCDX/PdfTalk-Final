@@ -213,8 +213,7 @@ const Index = () => {
     // console.log("Server is not started yet, showing waiting page data: ", data);
     return (
       <>
-        <BackendWarning />
-        <WaitingPage />;
+        <WaitingPage />
       </>
     );
   }
