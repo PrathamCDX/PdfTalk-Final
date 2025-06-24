@@ -65,7 +65,6 @@ class PredictRequest(BaseModel):
     info : str | None = "N0 one"
     num : int | None = 0
   
-
 @app.get("/")
 def read_root():
     return {"message": "Hello, FastAPI!"}
@@ -116,16 +115,16 @@ async def upload_file(googleAuth: str = Form(...), activeProjectId: str= Form(..
         context_text =await convert_pdf_to_text_large(file)
         print("sentence array ")
         print("-"*20)
-        sentences = get_sentence_array(context_text)
+        sentences = get_sentences_array_v2(context_text)
         print("paragraph array ")
         print("-"*20)
         para_chunks = chunk_text_with_overlap(context_text)
         print("sentence embeddings")
         print("-"*20)
-        sentences_embeddings =await generate_embeddings(sentences)
+        sentences_embeddings =await generate_embeddings_v2(sentences)
         print("paragraph embeddings ")
         print("-"*20)
-        para_chunks_embeddings =await generate_embeddings(para_chunks)
+        para_chunks_embeddings =await generate_embeddings_v2(para_chunks)
         print("done")
         op_info_sentences =await  insert_embeddings(sentences_embeddings, sentences, qdrant_client, activeProjectId)
         op_info_para_chunks =await  insert_embeddings(para_chunks_embeddings, para_chunks, qdrant_client, activeProjectId)
@@ -156,13 +155,18 @@ async def get_answer(request: getanswer):
         print("getans")
         question = request.question
         print(request)
-        embeddings = generate_embeddings([question])
-        context = get_context(question, qdrant_client, collection_name=request.collection_name, limit=request.limit)
+        
+        context =await get_context(question, qdrant_client, collection_name=request.collection_name, limit=request.limit)
         print("context : ")
         print(context)
-        answer = llm_response(question, context)
-        print(answer['answer'])
-        return JSONResponse(content= {"answer" : answer['answer']}, status_code=200)
+        # answer = llm_response(question, context)
+        # print(answer['answer'])
+        # return JSONResponse(content= {"answer" : answer['answer']}, status_code=200)
+        
+        answer = await ask_llm_v2(question, context)
+        print("answer : ")
+        return JSONResponse(content= {"answer" : answer}, status_code=200)  
+        
     except Exception as e:
         print(f"Error: {e}")
         traceback.print_exc()

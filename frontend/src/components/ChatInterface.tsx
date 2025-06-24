@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Send, MessageCircle, Bot, User } from "lucide-react";
 import { PDFProject } from "@/pages/Index";
 import axios from "axios";
+import ReactMarkdown from "react-markdown";
+import rehypeHighlight from "rehype-highlight";
 
 interface Message {
   id: string;
@@ -19,6 +21,8 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ project }) => {
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  const messagesEndRef = React.useRef<HTMLDivElement | null>(null);
+
   useEffect(() => {
     getChats(project.id);
   }, [project]);
@@ -28,6 +32,12 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ project }) => {
       updateChats(project.id, messages);
     }
   }, [messages]);
+
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages, isLoading]);
 
   const updateChats = async (projectId: string, messages: Message[]) => {
     try {
@@ -78,7 +88,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ project }) => {
     setMessages((prev) => [...prev, botMessage]);
     setIsLoading(false);
 
-    // 
+    //
     // console.log("get answer response  : ", response.data);
   };
 
@@ -124,7 +134,8 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ project }) => {
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-white dark:bg-gray-900 transition-colors">
+
+      <div className=" overflow-y-scroll  flex-1  p-4 space-y-4 bg-white dark:bg-gray-900 transition-colors">
         {messages?.length === 0 ? (
           <div className="text-center py-12">
             <Bot className="w-12 h-12 mx-auto mb-4 text-gray-300 dark:text-gray-700" />
@@ -143,8 +154,8 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ project }) => {
             </div>
           </div>
         ) : (
-          <>
-            {messages?.map((message) => (
+          <div className="">
+            {messages.map((message) => (
               <div
                 key={message.id}
                 className={`flex gap-3 ${
@@ -169,7 +180,11 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ project }) => {
                         : "bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                     }`}
                   >
-                    <p className="whitespace-pre-wrap">{message.content}</p>
+                    <p className="whitespace-pre-wrap">
+                      <ReactMarkdown rehypePlugins={[rehypeHighlight]}>
+                        {message.content}
+                      </ReactMarkdown>
+                    </p>
                   </div>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                     {(() => {
@@ -194,7 +209,6 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ project }) => {
                 )}
               </div>
             ))}
-
             {isLoading && (
               <div className="flex gap-3 justify-start">
                 <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/40 rounded-full flex items-center justify-center flex-shrink-0">
@@ -215,7 +229,8 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ project }) => {
                 </div>
               </div>
             )}
-          </>
+            <div ref={messagesEndRef} />
+          </div>
         )}
       </div>
 
