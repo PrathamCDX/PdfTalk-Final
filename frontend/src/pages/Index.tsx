@@ -137,7 +137,17 @@ const Index = () => {
     setProjects((prev) => [...prev, newProject]);
     setActiveProjectId(newProject.id);
   };
-
+  const deleteApiCall = async (projectId: string) => {
+    try {
+      const formData = new FormData();
+      formData.append("id", projectId);
+      const url: string = import.meta.env.VITE_BACKEND_URL;
+      const response = await axios.post(`${url}/delete`, formData);
+    } catch (error) {
+      console.error("Error deleting project:", error);
+      return;
+    }
+  };
   const handleDeleteProject = (projectId: string) => {
     // if(projects[0].id === projectId && ){
 
@@ -148,6 +158,8 @@ const Index = () => {
         setActiveProjectId(projects[0].id);
       }
     }
+
+    deleteApiCall(projectId);
   };
 
   const toggleSidebar = () => {

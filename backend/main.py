@@ -227,3 +227,28 @@ async def getProjects(googleAuth: str = Form(...)):
         print(f"Error: {e}")
         traceback.print_exc()
         return JSONResponse(content={"error": str(e)}, status_code=500)
+
+
+@app.post("/delete")
+def delete(id: str = Form(...)):
+    print("delete called for id : ", id)
+    try:
+        response = ( supabase
+            .storage
+            .from_("pdfs")
+            .remove([id])
+        )
+
+        response = (
+            supabase.table("Demo")
+            .delete()
+            .eq("id", id)
+            .execute()
+        )
+        
+        delete_collection(id, qdrant_client)
+        return JSONResponse(content={"message": "Chat deleted successfully"}, status_code=200)
+    except Exception as e:
+        print(f"Error: {e}")
+        traceback.print_exc()
+        return JSONResponse(content={"error": str(e)}, status_code=500)

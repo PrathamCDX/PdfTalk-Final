@@ -297,22 +297,26 @@ async def ask_llm_v2(question: str, context: str):
     return (chat_completion.choices[0].message.content)
 
 async def generate_embeddings_v2(sentences):
-    final_response = []
-    for i in range(0, len(sentences), 50):
-        batch = sentences[i:i + 50]
-        print(f"Processing batch {i // 50 + 1} with {len(batch)} sentences")
-        try:
-            response =  cohere_client.embed(
-                texts=batch,
-                model="embed-english-light-v3.0",
-                input_type="classification",
-                embedding_types=["float"],
-            )
-            final_response.append(response.embeddings.float_)
-        except Exception as e:
-            print(f"Error generating embeddings for batch {i // 50 + 1}: {e}")
+    try:
+        final_response = []
+        for i in range(0, len(sentences), 90):
+            batch = sentences[i:i + 90]
+            print(f"Processing batch {i // 90 + 1} with {len(batch)} sentences")
+            try:
+                response =  cohere_client.embed(
+                    texts=batch,
+                    model="embed-english-light-v3.0",
+                    input_type="classification",
+                    embedding_types=["float"],
+                )
+                final_response.append(response.embeddings.float_)
+            except Exception as e:
+                print(f"Error generating embeddings for batch {i // 90 + 1}: {e}")
 
-    return np.concatenate(final_response, axis=0)
+        return np.concatenate(final_response, axis=0)
+    except Exception as e:
+        print(f"Error in generate_embeddings_v2: {e}")
+        return np.array([])
 
 def get_sentences_array_v2(text):
     # Split on . ? ! followed by whitespace and a capital letter or end of string
