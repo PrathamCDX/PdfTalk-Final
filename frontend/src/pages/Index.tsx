@@ -11,6 +11,7 @@ import { authContext } from "@/App";
 import { Navigate, useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import BackendWarning from "@/components/BackendWarning";
+import { pingServer } from "@/lib/utils";
 
 export interface PDFProject {
   id: string;
@@ -20,12 +21,12 @@ export interface PDFProject {
   fileUrl?: string;
 }
 
-const Index = () => {
+export default function Index() {
   const navigate = useNavigate();
   const { googleAuth, setGoogleAuth } = useContext(authContext) || {};
 
   const [isMobile, setIsMobile] = React.useState(false);
-  const [serverStarted, setServerStarted] = React.useState(false);
+  const [serverLoading, setServerLoading] = React.useState(true);
   const [projects, setProjects] = useState<PDFProject[]>([]);
   const [activeProjectId, setActiveProjectId] = useState<string | null>(null);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -46,7 +47,7 @@ const Index = () => {
         const decoded = jwtDecode(googleAuth);
         // console.log((decoded as any).email);
         formData.append("googleAuth", (decoded as any).email || "");
-        if (true) {
+
           const url: string = import.meta.env.VITE_BACKEND_URL;
           const response = await axios.post(`${url}/getprojects`, formData);
           // setProjects((prev) => [...prev, ...response.data]);
@@ -60,7 +61,7 @@ const Index = () => {
           setActiveProjectId(newProject.id);
           setProjects((prev) => [...prev, newProject]);
           // console.log("Fetched projects:", response);
-        }
+        
       } catch (error) {
         console.error("Error fetching projects:", error);
       }
@@ -88,10 +89,6 @@ const Index = () => {
   }, [projects]);
 
   const activeProject = projects.find((p) => p.id === activeProjectId);
-
-  useEffect(() => {
-    // console.log("Active project ID changed:", activeProjectId);
-  }, [activeProjectId]);
 
   // Track file to upload if a new project is being created
 
@@ -149,11 +146,8 @@ const Index = () => {
     }
   };
   const handleDeleteProject = (projectId: string) => {
-    // if(projects[0].id === projectId && ){
-
-    // }
     setProjects((prev) => prev.filter((p) => p.id !== projectId));
-    if (activeProjectId === projectId || true) {
+    if (activeProjectId === projectId ) {
       if (projects.length > 0) {
         setActiveProjectId(projects[0].id);
       }
@@ -188,7 +182,7 @@ const Index = () => {
         // console.log("Upload success:", response.data);
         setUploadingPdf(false);
         return response.data.filename;
-      } catch (error: any) {
+      } catch (error) {
         console.error("Upload failed:", error);
         return null;
       }
@@ -197,20 +191,8 @@ const Index = () => {
 
   // Responsive: determine if screen is small (less than 768px, i.e., mobile)
 
-  const pingServer = async () => {
-    try {
-      const url: string = import.meta.env.VITE_BACKEND_URL;
-      const response = await axios.get(`${url}/`);
-      if (response.status === 200) {
-        setServerStarted(true);
-      }
-    } catch (error) {
-      console.error("Error pinging server:", error);
-    }
-  };
-
   React.useEffect(() => {
-    pingServer(); // Check server status on mount
+    pingServer(setServerLoading); // Check server status on mount
     const handleResize = () => {
       setIsMobile(window.innerWidth < 768);
     };
@@ -220,9 +202,7 @@ const Index = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  if (!serverStarted) {
-    // console.log(" loading :", isLoading);
-    // console.log("Server is not started yet, showing waiting page data: ", data);
+  if (serverLoading) {
     return (
       <>
         <WaitingPage />
@@ -296,6 +276,4 @@ const Index = () => {
       </div>
     </div>
   );
-};
-
-export default Index;
+}

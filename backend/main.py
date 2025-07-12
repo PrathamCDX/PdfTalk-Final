@@ -1,3 +1,4 @@
+from supabase import create_client, Client
 import traceback
 from qdrant_client import QdrantClient
 from fastapi import FastAPI
@@ -54,11 +55,15 @@ print_memory_usage()
 supabase_url = os.getenv("SUPABASE_URL")
 supabase_key = os.getenv("SUPABASE_KEY")
 
-from supabase import create_client, Client
 
 url: str = supabase_url
 key: str = supabase_key
 supabase: Client = create_client(url, key)
+print("supabase initialised : ")
+print(supabase)
+
+response = supabase.table("Demo").select("id").limit(1).execute()
+print("response   : ", response)
 
 class PredictRequest(BaseModel):
     foo: str | None = None
@@ -170,7 +175,7 @@ async def get_answer(request: getanswer):
     except Exception as e:
         print(f"Error: {e}")
         traceback.print_exc()
-        return JSONResponse(content={"error": str(e)}, status_code=500)
+        return JSONResponse(content={"answer" : "Error! please retry "}, status_code=200)
 
 @app.post('/getchat')
 async def getChat (id:str = Form(...)):
@@ -224,7 +229,7 @@ async def getProjects(googleAuth: str = Form(...)):
         print(response.data)
         return JSONResponse(content=response.data, status_code=200)     
     except Exception as e:
-        print(f"Error: {e}")
+        print(f"Error in getprojects: {e}")
         traceback.print_exc()
         return JSONResponse(content={"error": str(e)}, status_code=500)
 

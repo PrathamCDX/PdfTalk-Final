@@ -81,7 +81,9 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ project }) => {
     const botMessage: Message = {
       id: crypto.randomUUID(),
       type: "bot",
-      content: response.data.answer,
+      content:
+        response.data.answer ||
+        "Sorry, I couldn't find an answer to your question.",
       timestamp: new Date(),
     };
 
@@ -89,7 +91,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ project }) => {
     setIsLoading(false);
 
     //
-    // console.log("get answer response  : ", response.data);
+    console.log("get answer response  : ", response.data);
   };
 
   const handleSendMessage = async () => {

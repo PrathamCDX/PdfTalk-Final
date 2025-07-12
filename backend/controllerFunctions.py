@@ -5,6 +5,7 @@ from qdrant_client import QdrantClient
 from qdrant_client.http.models import Distance, VectorParams
 from qdrant_client.models import PointStruct
 import os
+import time
 from dotenv import load_dotenv, find_dotenv
 import tempfile
 import pdfplumber
@@ -21,8 +22,8 @@ import re
 dotenv_path = find_dotenv()
 load_dotenv(dotenv_path)
 
-
-
+global value
+value = 1
 
 cohere_api_key: str = os.getenv("COHERE_API_KEY")
 qdrant_api_key_write = os.getenv("QDRANT_API_KEY_WRITE")
@@ -149,6 +150,8 @@ def delete_collection(collection_name, qdrant_client):
 #   return article_sentences
 
 async def get_context ( question, qdrant_client,collection_name, limit=3):
+  global value
+  value += 1
   question_array = []
   question_array.append(question)
   print(question_array)
@@ -212,8 +215,6 @@ async def convert_pdf_to_text_large(pdf_file: UploadFile):
         # Reset the file pointer if needed
         await pdf_file.seek(0)
         
-        
-
 def upload_pdf_to_supabase(
     supabase: Client,
     file, 
@@ -280,6 +281,7 @@ def print_memory_usage():
         print(f"Detailed memory info not available: {e}")
 
 async def ask_llm_v2(question: str, context: str):
+    print("value : ", value)
     client = Groq(api_key=groq_api_key)
     reduced_context = context[:5000]
     prompt = f"Using the following context, answer the question:\n\nContext: {reduced_context}\n\nQuestion: {question}"
@@ -299,9 +301,13 @@ async def ask_llm_v2(question: str, context: str):
 async def generate_embeddings_v2(sentences):
     try:
         final_response = []
+        # limit of 39 batches per minute
+        # 90 sentences per request
         for i in range(0, len(sentences), 90):
+            # add rate limiter 
             batch = sentences[i:i + 90]
             print(f"Processing batch {i // 90 + 1} with {len(batch)} sentences")
+            
             try:
                 response =  cohere_client.embed(
                     texts=batch,
@@ -312,13 +318,16 @@ async def generate_embeddings_v2(sentences):
                 final_response.append(response.embeddings.float_)
             except Exception as e:
                 print(f"Error generating embeddings for batch {i // 90 + 1}: {e}")
-
+            finally:
+                time.sleep(2)
         return np.concatenate(final_response, axis=0)
     except Exception as e:
         print(f"Error in generate_embeddings_v2: {e}")
         return np.array([])
 
 def get_sentences_array_v2(text):
+    global value
+    value += 1
     # Split on . ? ! followed by whitespace and a capital letter or end of string
     pattern = r'(?<=[.!?])\s+(?=[A-Z])'
     sentences = re.split(pattern, text)
